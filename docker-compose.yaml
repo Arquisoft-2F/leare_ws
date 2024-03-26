@@ -1,0 +1,46 @@
+version: '3'
+services:
+  chat-db:
+    image: mongo:7.0
+    volumes:
+      - ../db/leare_chat_db:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+    networks:
+      - leare-network
+
+  chat-web:
+    build:
+      context: ../leare_chat_ms
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_URL: mongodb://root:password@mongo:27017/
+    depends_on:
+      - chat-db
+    networks:
+      - leare-network
+
+  ws:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      CHAT_MS_URL: "http://chat-web:3002"
+    depends_on:
+      - chat-web
+    networks:
+      - leare-network
+
+networks:
+  leare-network:
+    driver: bridge
+
