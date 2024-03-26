@@ -1,6 +1,8 @@
 from fastapi import WebSocket
 from src.utils.connectionManager import ConnectionManager
-from src.utils.api_requests import send_message, edit_message, delete_message
+from src.utils.api_requests import edit_message, delete_message
+from src.utils.api_requests import send_message as send_message_req
+
 
 class ChatWebSocketController:
     manager = ConnectionManager()
@@ -20,7 +22,7 @@ class ChatWebSocketController:
 
     @classmethod
     async def send_message(cls, connection_id: str, room_id: str, user_id: str, nickname: str, content: str, created_at: str):
-        msg = send_message(room_id, user_id, nickname, content)
+        msg = send_message_req(room_id, user_id, nickname, content)
         message = {
             "type": "message_sent",
             "id": str(msg["id"]),
